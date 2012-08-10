@@ -8,14 +8,7 @@ public class Player {
 	public int[] allCards; //Wood, Sheep, Brick, Rock, Wheat
 	public int victoryPoints;
 	ArrayList<DevCard> devCards;
-	
-	/*
-	public int numOfWood;
-	public int numOfSheep;
-	public int numOfBrick;
-	public int numOfRock;
-	public int numOfWheat;
-	*/
+	public long time;
 	
 	/**
 	 * Creates an instance of Player with no cards and victory points.
@@ -34,6 +27,17 @@ public class Player {
 	public Player(String name) {
 		this();
 		this.name = name;
+	}
+	
+	/**
+	 * 
+	 * @param time
+	 * @param name
+	 * Creates an instance of Player with time 'time', and no cards and victory points.
+	 */
+	public Player(long time, String name) {
+		this(name);
+		this.time = time;
 	}
 	
 	/**
@@ -79,17 +83,30 @@ public class Player {
 		devCards.add(devCard);
 	}
 	
-	public String toString() {
-		return name + "\nNumber of Cards: " + numOfCards + "\n" + "Cards (Wood, Sheep, Brick, Rock, Wheat)\n" + allCardsString() +
-				"\nVictory Points: " + victoryPoints + "\nDev Cards " + devCards.toString();
-	}
-	
 	public String allCardsString() {
 		String toReturn = "" + allCards[0];
 		for (int i = 1; i < 5; i++) {
 			toReturn = toReturn + ", " + allCards[i];
 		}
 		return "[" + toReturn + "]";
+	}
+	
+	
+	public String toString() {
+		return name + "\nNumber of Cards: " + numOfCards + "\n" + "Cards (Wood, Sheep, Brick, Rock, Wheat)\n" + allCardsString() +
+				"\nVictory Points: " + victoryPoints + "\nDev Cards " + devCards.toString();
+	}
+	
+	public int hashCode() {
+		return name.hashCode() + (int) time;
+	}
+	
+	public boolean equals(Object object) {
+		if (object == null) { return false; }
+		if (!(object instanceof Player)) { return false; }
+		Player isSame = (Player) object;
+		if (isSame.hashCode() == this.hashCode()) { return true; }
+		return false;
 	}
 	
 }

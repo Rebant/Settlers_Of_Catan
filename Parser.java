@@ -31,8 +31,15 @@ public class Parser {
 	 */
 	public void determineType(String currentLine) {
 		String[] stuff = currentLine.split(";");
+		if (stuff[0].startsWith("/*")) { return; }
 		if (stuff[0].equals("DC")) {
 			game.addDevCard(stuff[1], stuff[2]);
+		}
+		else if (stuff[0].equals("Hex")) {
+			int hexagon = Integer.parseInt(stuff[1]);
+			int dieToRoll = Integer.parseInt(stuff[2]);
+			int type = Integer.parseInt(stuff[3]);			
+			game.setHexagon(hexagon, dieToRoll, type);
 		}
 	}
 

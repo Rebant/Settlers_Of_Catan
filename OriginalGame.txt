@@ -1,0 +1,30 @@
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Knight;Move
+DC;Market;One victory point
+DC;Library;One victory point
+DC;Chapel;One victory point
+DC;University;One victory point
+DC;Parlement;One victory point
+DC;Monopoly;Call one resource name and take them from all players
+DC;Monopoly;Call one resource name and take them from all players
+DC;Year of Plenty;Take any two resources from the bank
+DC;Year of Plenty;Take any two resources from the bank
+DC;Road Building;Build two roads
+DC;Road Building;Build two roads

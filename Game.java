@@ -3,15 +3,17 @@ import java.util.Random;
 
 public class Game {
 
-	Player[] allPlayers;
+	Player[] allPlayers; int currentPlayerInt;
 	int[] resourceBank; //Wood, Sheep, Brick, Rock, Wheat
 	ArrayList<DevCard> allDevCards = new ArrayList<DevCard>();
 	Parser parser;
+	boolean done = false;
+	Map map; //Map for this game
 	
 	/* Game stuff */
 	Player currentPlayer; //Current player's turn
-	Map map; //Map for this game
 	int onPlayer;
+	int[] rolledDice;
 	
 	/**
 	 * Creates an instance of Game with 30 starting resource cards for each type
@@ -42,10 +44,11 @@ public class Game {
 	 * @param name
 	 * Setup the next player.
 	 */
-	public void setupPlayer(String name) {
+	public Player setupPlayer(String name) {
 		for (int i = 0; i < allPlayers.length; i++) {
-			if (allPlayers[i] == null) { allPlayers[i] = new Player(name); return; }
-		}	
+			if (allPlayers[i] == null) { allPlayers[i] = new Player(System.nanoTime(), name); return allPlayers[i]; }
+		}
+		return null;
 	}
 	
 	/**
@@ -57,14 +60,23 @@ public class Game {
 		allDevCards.add(new DevCard(name, description));
 	}
 	
+	/**
+	 * @param hexagon
+	 * @param dieToRoll
+	 * @param type
+	 * Sets hexagon 'hexagon'.
+	 */
+	public void setHexagon(int hexagon, int dieToRoll, int type) {
+		map.setHexagon(hexagon, dieToRoll, type);
+	}
+	
 	/* Game play actions */
 	/**
 	 * @return The two die rolls rolled by this player.
 	 */
-	public int[] rollDie() {
+	public void rollDie() {
 		Random generator = new Random();
-		int[] rolledDie = {generator.nextInt(6) + 1, generator.nextInt(6) + 1};
-		return rolledDie;
+		rolledDice = new int[] {generator.nextInt(6) + 1, generator.nextInt(6) + 1};
 	}
 	
 	/**
@@ -74,10 +86,20 @@ public class Game {
 	 * Draws the appropriate type of card from the bank if there is at least one
 	 * card of that type in the bank. 
 	 */
-	public boolean drawResourceCard(int type, Player player) {
-		if (resourceBank[type] <= 0) { return false; }
-		player.addCard(type); drawCard(type);
-		return true;
+	public void drawResourceCard(int type, Player player) {
+		System.out.println("Player " + player.name + " is drawing.");
+		if (resourceBank[type] <= 0) { System.out.println(player.hashCode() + " cannot draw a card."); return; }
+		player.addCard(type);
+		drawCard(type);
+	}
+	
+	/**
+	 * @param type
+	 * Draws the appropriate type of card from the bank for the current player.
+	 */
+	public void drawResourceCard(int type) {
+		System.out.println("Drawing a card!");
+		drawResourceCard(type, currentPlayer);
 	}
 	
 	/**
@@ -93,9 +115,18 @@ public class Game {
 	 * This is a random draw every time - depends on when they draw it because our
 	 * instance of the generator is created again and again.
 	 */
-	public void drawDevCard() {
+	public void drawDevCard(Player player) {
 		Random generator = new Random();
-		currentPlayer.addDevCard(allDevCards.remove(generator.nextInt(allDevCards.size())));
+		player.addDevCard(allDevCards.remove(generator.nextInt(allDevCards.size())));
+	}
+	
+	/**
+	 * Puts back the selected DevCard from 'player's collection.
+	 */
+	public void putDevCardBack(Player player, DevCard devCard) {
+		if (!player.devCards.contains(devCard)) { return; }
+		addDevCard(devCard.name, devCard.description);
+		player.devCards.remove(devCard);
 	}
 	
 	/**
@@ -103,7 +134,12 @@ public class Game {
 	 * Returns the appropriate card type back in to the bank.
 	 */
 	public void putResourceBack(int type) {
-		if (currentPlayer.removeCard(type)) { resourceBank[type]++; }
+		putResourceBack(type, currentPlayer);
+	}
+	
+	public void putResourceBack(int type, Player player) {
+		System.out.println("Putting a card back.");
+		if (player.removeCard(type)) { resourceBank[type]++; }
 	}
 	
 	/**
@@ -118,8 +154,8 @@ public class Game {
 		
 		for (int i = 0; i < allSpaces.length; i++) {
 			if (allSpaces[i].getDieToRoll() == dieRoll) { //If this Hexagon has the right number
-				for (int j = 0; j < 6; j++) { //Look in all of the spots and add the player
-					if (allSpaces[i].getOnSpot(j) != null) {
+				for (int j = 0; j < 6; j++) { //Look in all of the spots and add the settlement
+					if (allSpaces[i].getOnSpot(j) != null) { //If it exists, of course
 						playersToDraw.add(allSpaces[i].getOnSpot(j));
 					}
 				}
@@ -137,13 +173,94 @@ public class Game {
 	}
 	
 	/**
+	 * @param hexagon
+	 * @param space
+	 * Sets the appropriate hexagon's 'space' as a new settlement for 'player'.
+	 */
+	public void addSettlement(int hexagon, int space, Player player) {
+		map.setNewSettlement(hexagon, space, player);
+	}
+	
+	/**
+	 * @param hexagon
+	 * @param space
+	 * @param player
+	 * Increases the draw amount for the settlement at 'hexagon's 'space'.
+	 */
+	public void addCity(int hexagon, int space, Player player) {
+		map.addDrawToHexagon(hexagon, space, player);
+	}
+	
+	/**
+	 * @param hexagon
+	 * @param road
+	 * @param player
+	 * Sets the road of hexagon 'hexagon's 'road' to a new road if
+	 * it does not currently have a road on it.
+	 */
+	public void addRoad(int hexagon, int road, Player player) {
+		map.addRoad(hexagon, road, player);
+	}
+	
+	/**
 	 * Advances the turn to the next player.
 	 */
 	public void nextTurn() {
-		currentPlayer = allPlayers[(onPlayer + 1) % allPlayers.length];
+		currentPlayerInt = (currentPlayerInt + 1) % allPlayers.length;
+		currentPlayer = allPlayers[currentPlayerInt];
+		onPlayer = currentPlayer.hashCode();
 	}
-
 	
+	/**
+	 * Starts the game by making the current player the first one in the array.
+	 */
+	public void begin() {
+		currentPlayer = allPlayers[0];
+		System.out.println("The first player is " + currentPlayer.name);
+		onPlayer = currentPlayer.hashCode();
+		currentPlayerInt = 0;
+	}
 	
+	/**
+	 * @param hash
+	 * @return The Player with the associated hash 'hash'.
+	 */
+	public Player getPlayerFromHash(int hash) {
+		for (int i = 0; i < allPlayers.length; i++) {
+			if (allPlayers[i].hashCode() == hash) { return allPlayers[i]; }
+		}
+		return null;
+	}
+	
+	/**
+	 * Randomizes the order in which the players are in.
+	 */
+	public void randomizeOrder() {
+		ArrayList<Player> settingUp = new ArrayList<Player>();
+		for (int i = 0; i < allPlayers.length; i++) { settingUp.add(allPlayers[i]); }
+		Random generator = new Random();
+		Player[] newArrangement = new Player[allPlayers.length];
+		int i = 0;
+		while (hasNull(newArrangement)) {
+			Player toAdd = settingUp.remove(generator.nextInt(settingUp.size()));
+			newArrangement[i] = toAdd; i++;
+		}
+		allPlayers = newArrangement;
+	}
+	
+	public String getOrder() {
+		String order = "";
+		for (int i = 0; i < allPlayers.length; i++) { order = order + allPlayers[i].name + " "; }
+		return order;
+	}
+	
+	/**
+	 * @param player
+	 * @return True if there is a null in 'player'.
+	 */
+	public boolean hasNull(Player[] player) {
+		for (int i = 0; i < player.length; i++) { if (player[i] == null) { return true; } }
+		return false;
+	}
 	
 }
