@@ -20,6 +20,7 @@ public class Request implements Comparable<Request> {
 	 * 9. Add road
 	 * 999. Error - print the message
 	 * 1001. Start the game
+	 * 1002. Update stats for clients
 	 */
 	
 	private boolean goodRequest = false;
@@ -33,6 +34,8 @@ public class Request implements Comparable<Request> {
 	private int onSpotSelected;
 	private int roadsSpotSelected;
 	private String chatText;
+	private int[] mapTypes;
+	private int[] resourceStats;
 
 	public void setRequest(int request) {
 		this.request = request;
@@ -114,6 +117,23 @@ public class Request implements Comparable<Request> {
 		this.chatText = chatText;
 	}
 	
+	
+	public int[] getMapTypes() {
+		return mapTypes;
+	}
+
+	public void setMapTypes(int[] mapTypes) {
+		this.mapTypes = mapTypes;
+	}
+
+	public int[] getResourceStats() {
+		return resourceStats;
+	}
+
+	public void setResourceStats(int[] resourceStats) {
+		this.resourceStats = resourceStats;
+	}
+
 	// TODO Do I need this?
 	@Override
 	public int compareTo(Request o) {

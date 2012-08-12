@@ -13,7 +13,7 @@ public class ClientSide {
 
 	public Client client; //To connect with the server
 	public int nameHash; //The name for this client
-	public ClientSideGUI theGUI;
+	public ClientSideGUIFinal theGUI;
 	
 	public static void main(String[] args) throws IOException {
 //		InputStreamReader istream = new InputStreamReader(System.in);
@@ -51,6 +51,7 @@ public class ClientSide {
 				
 		Kryo kryo = client.getKryo();
 		kryo.register(Request.class);
+		kryo.register(int[].class);
 		
 		client.start();
 		
@@ -82,6 +83,7 @@ public class ClientSide {
 		
 		while (true) {
 			//Bogus line so this continues forever...
+			//TODO Better memory management
 		}
 		
 		
@@ -93,7 +95,8 @@ public class ClientSide {
 		switch (request) {
 			case 99: nameHash = toHandle.getReturnName(); System.out.println("Our hash is " + nameHash); break;
 			case 999: System.out.println("Error: " + toHandle.getMessage()); break;
-			case 1001: System.out.println("Woot."); theGUI = new ClientSideGUI(this, nameHash); break;
+			case 1001: System.out.println("Woot."); theGUI = new ClientSideGUIFinal(this, nameHash, toHandle.getMapTypes()); break;
+			case 1002: System.out.println("Updating stats..."); theGUI.updateResourceNumber(toHandle.getResourceStats()); break;
 			default: System.out.println("Something bad happened."); System.exit(-100); break;
 		}
 		

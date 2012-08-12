@@ -7,23 +7,29 @@ public class Hexagon {
 	 * Each Hexagon has an appropriate resource type starting from 0 to 4
 	 * as: Wood, Sheep, Brick, Rock, Wheat; if the type is -1, then it is
 	 * a desert hexagon
-	 * Starting from the top left corner, the corners are numbered starting
+	 * Starting from the top left corner, the vertices are numbered starting
 	 * at 0 and go clockwise incrementing by 1 as shown in the diagram below
-    		0__1                            _0_
-   		   5/  \2    Settlements | Roads  5/   \1
-   		   4\__/3                         4\_3_/2
+	 * and represent the places where the settlements are
+    		   0__1                            _0_
+   		      5/  \2    Settlements | Roads  5/   \1
+   		       \__/                          4\_3_/2
+   		       4  3
    	 * There is a number for each Hexagon inside that states the roll which
    	 * gives a player on that Hexagon that resource
    	 * Roads are round between the 'onSpot's - they are to the right of each
    	 * of the numbers on the edges - for example, road 0 is in the middle of
-   	 * 'onSpot' 0 and 1.
+   	 * 'onSpot' 0 and 1; essentially, the sides of the hexagon correspond to
+   	 * a road as shown in the diagram above
+   	 * A bandit can be on the spot and prevents all settlements on the slot
+   	 * from collecting any resources
 	 */
  
 	
-	public Settlement[] onSpot; //Which settlement is on this spot with a house or city
-	public Road[] roads;
+	public Settlement[] onSpot; //Which Settlement is on this spot with a house or city
+	public Road[] roads; //Which Road is on this road
 	public int dieToRoll; //Number needed to get this resource
 	public int type; //Type of resource one can get from this Hexagon - Wood, Sheep, Brick, Rock, Wheat
+	public boolean bandit; //True if bandit is on the spot; false otherwise
 	
 	/**
 	 * Creates an instance of Hexagon with no players on any spot.

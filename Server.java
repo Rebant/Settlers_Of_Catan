@@ -19,7 +19,9 @@ public class Server {
 	int whoseTurn;
 	PriorityQueue<RequestConnection> allRequests = new PriorityQueue<RequestConnection>();
 	ArrayList<Connection> allConnections = new ArrayList<Connection>();
+	ArrayList<Integer> allHashes = new ArrayList<Integer>();
 	public int numOfPlayers = 0;
+	public boolean initialized = false;
 	
 	public static void main(String[] args) throws IOException {
 //		InputStreamReader istream = new InputStreamReader(System.in);
@@ -53,7 +55,7 @@ public class Server {
 //		}
 //		
 //		new Server(numOfPlayers, filename, portIn, portOut);
-		new Server(4, "OriginalGame.txt", 53777, 54777);
+		new Server(1, "OriginalGame.txt", 53777, 54777);
 	}
 	
 	/**
@@ -76,6 +78,7 @@ public class Server {
 		
 		Kryo kryo = server.getKryo();
 		kryo.register(Request.class); //Unsupported by 1.6 Java - need 1.7
+		kryo.register(int[].class);
 		System.out.println("Registered all pertinent classes...");
 		
 		server.start();
@@ -98,7 +101,7 @@ public class Server {
 		server.addListener(new Listener() {
 			public void received(Connection connection, Object object) {
 				if (object instanceof Request) {
-					addIfNotIn(connection);
+					addIfNotIn(connection); //TODO Do not need to check this everytime right?
 					Request bleh = (Request) object;
 
 					System.out.println("Got something: " + bleh.getRequest());
@@ -117,6 +120,7 @@ public class Server {
 		while (this.numOfPlayers != game.allPlayers.length) {
 			if (allRequests.isEmpty()) { continue; }
 			handleRequest(allRequests.remove());
+			//TODO Better memory management
 		}
 		System.out.println("All players have joined the game...");
 		
@@ -158,6 +162,7 @@ public class Server {
 	 * 9. Add road
 	 * 999. Error - print the message
 	 * 1001. Start the game
+	 * 1002. Update stats for clients
 	 */	
 	
 	public void handleRequest(RequestConnection toHandle) {
@@ -179,6 +184,8 @@ public class Server {
 			case 9: gameAddRoad(theRequest, connection); break;
 			default: System.out.println("Someone is trying to hack this game!"); System.exit(-100); break;
 		}
+		
+		if (initialized) { updateStats(); }
 		
 		//TODO: Update every person's screen!!!
 		
@@ -278,9 +285,12 @@ public class Server {
 	private void gameSetupPlayer(Request request, Connection connection) {
 		String name = request.getRequestString();
 		Player created = game.setupPlayer(name);
-		if (created == null) { connection.sendTCP(new Request()); return; }
+		if (created == null) { connection.sendTCP(new Request()); return; } //TODO Tell user to send in the name again?
 		Request toSendBack = new Request();
-		toSendBack.setReturnName(created.hashCode());
+		int hashCode = created.hashCode();
+		allHashes.add(hashCode); //TODO Should do this someplace else in case get more than the amount of hashcodes
+		System.out.println("There are now " + allHashes.size() + " hash codes.");
+		toSendBack.setReturnName(hashCode);
 		toSendBack.setRequest(99);
 		connection.sendTCP(toSendBack);
 		numOfPlayers++;
@@ -313,7 +323,27 @@ public class Server {
 	public void startGame() {
 			Request startGame = new Request();
 			startGame.setRequest(1001);
+			startGame.setMapTypes(game.map.getAllTypes());
 			for (int i = 0; i < allConnections.size(); i++) { allConnections.get(i).sendTCP(startGame); }
+			initialized = true;
+			updateStats();
+	}
+	
+	public void updateStats() {
+		Player player;
+		int[] stats;
+		Request toSend;
+		for (int i = 0; i < allConnections.size(); i++) {
+			player = game.getPlayerFromHash(allHashes.get(i));
+			stats = player.getAllCards();
+			toSend = new Request();
+			toSend.setRequest(1002);
+			toSend.setResourceStats(stats);
+			allConnections.get(i).sendTCP(toSend);
+		}
+		//TODO Update dev cards
+		//TODO Update map
+		//TODO Update chat
 	}
 	
 }

@@ -80,4 +80,15 @@ public class Map {
 		return allSpaces;
 	}
 	
+	/**
+	 * @return An array of all the types for the hexagons in order.
+	 */
+	public int[] getAllTypes() {
+		int[] toReturn = new int[allSpaces.length];
+		for (int i = 0; i < allSpaces.length; i++) {
+			toReturn[i] = allSpaces[i].getType();
+		}
+		return toReturn;
+	}
+	
 }

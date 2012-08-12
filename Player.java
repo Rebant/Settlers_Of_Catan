@@ -91,6 +91,10 @@ public class Player {
 		return "[" + toReturn + "]";
 	}
 	
+	public int[] getAllCards() {
+		return allCards;
+	}
+	
 	
 	public String toString() {
 		return name + "\nNumber of Cards: " + numOfCards + "\n" + "Cards (Wood, Sheep, Brick, Rock, Wheat)\n" + allCardsString() +

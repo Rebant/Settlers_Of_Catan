@@ -78,6 +78,35 @@ public class ClientSideGUI extends javax.swing.JFrame {
         }
     }
     
+//    public void updateResourceNumber(int[] numOfEachCard) {
+//    	for (int i = 0; i < allStatsLabel.length; i++) {
+//    		System.out.println("Updating " + i + " and original text was " + allStatsLabel[i].getText());
+//    		allStatsLabel[i].setText("" + numOfEachCard[i]);
+//    	}
+//    	repaint();
+//    }
+    
+//    public void setupAllHexs(int[] attributeOfHex) {
+//    	for (int i = 0; i < allHexs.length; i++) {
+//    		System.out.println("Setting up hex " + i);
+//    		setupIndividualHex(allHexs[i], attributeOfHex[i]);
+//    	}
+//    }
+    
+    public void setupIndividualHex(PaintImage hexToSetup, int type) {
+    	String logo = "";
+    	switch (type) {
+    		case -1: logo = "desertHexLogo"; break;
+    		case 0: logo = "woodHexLogo"; break;
+    		case 1: logo = "sheepHexLogo"; break;
+    		case 2: logo = "brickHexLogo"; break;
+    		case 3: logo = "rockHexLogo"; break;
+    		case 4: logo = "wheatHexLogo"; break;
+    		default: System.out.println("Someone is trying to hack the game."); System.exit(-100); break;
+    	}
+    	hexToSetup.setImage("images/" + logo);
+    }
+    
 //    public void setupAllHexs(Map map) {
 //    	Hexagon[] allSpaces = map.getAllSpaces();
 //    	for (int i = 0; i < allSpaces.length; i++) {
@@ -156,33 +185,8 @@ public class ClientSideGUI extends javax.swing.JFrame {
         statsOfPlayers = new javax.swing.JButton();
         changeDrawButton = new javax.swing.JToggleButton();
         rollDiceButton = new javax.swing.JButton();
-
-//        For final implementation:
-//        hex0 = new PaintImage();
-//        hex1 = new PaintImage();
-//        hex2 = new PaintImage();
-//        hex3 = new PaintImage();
-//        hex4 = new PaintImage();
-//        hex5 = new PaintImage();
-//        hex6 = new PaintImage();
-//        hex7 = new PaintImage();
-//        hex8 = new PaintImage();
-//        hex9 = new PaintImage();
-//        hex10 = new PaintImage();
-//        hex11 = new PaintImage();
-//        hex12 = new PaintImage();
-//        hex13 = new PaintImage();
-//        hex14 = new PaintImage();
-//        hex15 = new PaintImage();
-//        hex16 = new PaintImage();
-//        hex17 = new PaintImage();
-//        hex18 = new PaintImage();
-//        woodLogoPanel = new PaintImage("images/woodLogo");
-//        sheepLogoPanel = new PaintImage("images/sheepLogo");
-//        brickLogoPanel = new PaintImage("images/brickLogo");
-//        rockLogoPanel = new PaintImage("images/rockLogo");
-//        wheatLogoPanel = new PaintImage("images/wheatLogo");
-//        devCardLogoPanel = new PaintImage("images/devCardLogo");    
+        dieRollOne = new javax.swing.JLabel();
+        dieRollTwo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -430,7 +434,7 @@ public class ClientSideGUI extends javax.swing.JFrame {
                     .addComponent(hex10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(hex15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(hex5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(119, Short.MAX_VALUE))
+                .addContainerGap(129, Short.MAX_VALUE))
         );
         mapPanelLayout.setVerticalGroup(
             mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -503,14 +507,16 @@ public class ClientSideGUI extends javax.swing.JFrame {
         woodLogoPanelLayout.setHorizontalGroup(
             woodLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(woodLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(woodNumberLabel)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         woodLogoPanelLayout.setVerticalGroup(
             woodLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(woodLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(woodNumberLabel)
-                .addGap(0, 86, Short.MAX_VALUE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         sheepNumberLabel.setForeground(new java.awt.Color(51, 255, 0));
@@ -521,14 +527,16 @@ public class ClientSideGUI extends javax.swing.JFrame {
         sheepLogoPanelLayout.setHorizontalGroup(
             sheepLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sheepLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(sheepNumberLabel)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         sheepLogoPanelLayout.setVerticalGroup(
             sheepLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(sheepLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(sheepNumberLabel)
-                .addGap(0, 86, Short.MAX_VALUE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         brickNumberLabel.setForeground(new java.awt.Color(0, 0, 204));
@@ -539,14 +547,16 @@ public class ClientSideGUI extends javax.swing.JFrame {
         brickLogoPanelLayout.setHorizontalGroup(
             brickLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(brickLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(brickNumberLabel)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         brickLogoPanelLayout.setVerticalGroup(
             brickLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(brickLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(brickNumberLabel)
-                .addGap(0, 86, Short.MAX_VALUE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         rockNumberLabel.setForeground(new java.awt.Color(255, 0, 0));
@@ -557,14 +567,16 @@ public class ClientSideGUI extends javax.swing.JFrame {
         rockLogoPanelLayout.setHorizontalGroup(
             rockLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(rockLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(rockNumberLabel)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         rockLogoPanelLayout.setVerticalGroup(
             rockLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(rockLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(rockNumberLabel)
-                .addGap(0, 86, Short.MAX_VALUE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         wheatNumberLabel.setForeground(new java.awt.Color(0, 204, 0));
@@ -575,14 +587,16 @@ public class ClientSideGUI extends javax.swing.JFrame {
         wheatLogoPanelLayout.setHorizontalGroup(
             wheatLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(wheatLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(wheatNumberLabel)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         wheatLogoPanelLayout.setVerticalGroup(
             wheatLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(wheatLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(wheatNumberLabel)
-                .addGap(0, 86, Short.MAX_VALUE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         devCardNumberLabel.setForeground(new java.awt.Color(0, 0, 204));
@@ -593,14 +607,16 @@ public class ClientSideGUI extends javax.swing.JFrame {
         devCardLogoPanelLayout.setHorizontalGroup(
             devCardLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(devCardLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(devCardNumberLabel)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         devCardLogoPanelLayout.setVerticalGroup(
             devCardLogoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(devCardLogoPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(devCardNumberLabel)
-                .addGap(0, 86, Short.MAX_VALUE))
+                .addContainerGap(75, Short.MAX_VALUE))
         );
 
         woodDrawButton.setText("Wood");
@@ -664,6 +680,10 @@ public class ClientSideGUI extends javax.swing.JFrame {
             }
         });
 
+        dieRollOne.setText("1");
+
+        dieRollTwo.setText("1");
+
         javax.swing.GroupLayout cardPanelLayout = new javax.swing.GroupLayout(cardPanel);
         cardPanel.setLayout(cardPanelLayout);
         cardPanelLayout.setHorizontalGroup(
@@ -677,32 +697,34 @@ public class ClientSideGUI extends javax.swing.JFrame {
                             .addComponent(woodLogoPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(woodDrawButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(sheepLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(sheepDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(brickLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(brickDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(rockDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
-                            .addComponent(rockLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(wheatLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(wheatDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))))
-                .addGap(18, 18, 18)
-                .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(devCardLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, cardPanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(devCardDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(statsOfPlayers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(changeDrawButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                        .addGap(5, 5, 5)))
-                .addContainerGap())
+                        .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(cardPanelLayout.createSequentialGroup()
+                                .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(sheepLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(sheepDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(brickLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(brickDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(rockDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                    .addComponent(rockLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(wheatLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(wheatDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)))
+                            .addGroup(cardPanelLayout.createSequentialGroup()
+                                .addComponent(dieRollOne, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(dieRollTwo)))))
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(devCardDrawButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(statsOfPlayers, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(changeDrawButton, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(devCardLogoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(25, 25, 25))
         );
         cardPanelLayout.setVerticalGroup(
             cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -729,8 +751,10 @@ public class ClientSideGUI extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(cardPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(statsOfPlayers)
-                    .addComponent(rollDiceButton))
-                .addContainerGap(16, Short.MAX_VALUE))
+                    .addComponent(rollDiceButton)
+                    .addComponent(dieRollOne)
+                    .addComponent(dieRollTwo))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -887,6 +911,8 @@ public class ClientSideGUI extends javax.swing.JFrame {
     private javax.swing.JButton devCardDrawButton;
     private javax.swing.JPanel devCardLogoPanel;
     private javax.swing.JLabel devCardNumberLabel;
+    private javax.swing.JLabel dieRollOne;
+    private javax.swing.JLabel dieRollTwo;
     private javax.swing.JPanel hex0;
     private javax.swing.JPanel hex1;
     private javax.swing.JPanel hex10;
@@ -954,6 +980,8 @@ public class ClientSideGUI extends javax.swing.JFrame {
 //     private PaintImage hex17;
 //     private PaintImage hex18;
 //     private PaintImage[] allHexs = { hex0, hex1, hex2, hex3, hex4, hex5, hex6, hex7, hex8, hex9, hex10, hex11, hex12, hex13, hex14, hex15, hex16, hex17, hex18 };
+//     
+    
     
 }
 
