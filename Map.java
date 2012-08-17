@@ -46,17 +46,6 @@ public class Map {
 	
 	/**
 	 * @param hexagon
-	 * @param space
-	 * @param player
-	 * Sets the onSpot of hexagon 'hexagon's 'space' to a new settlement with one
-	 * draw if it does not currently have a settlement on it.
-	 */
-	public void setNewSettlement(int hexagon, int space, Player player) {
-		allSpaces[hexagon].setSpace(space, player);
-	}
-	
-	/**
-	 * @param hexagon
 	 * @param road
 	 * @param player
 	 * Sets the road of hexagon 'hexagon's 'road' to a new road if
@@ -70,14 +59,34 @@ public class Map {
 	 * @param hexagon
 	 * @param space
 	 * @param player
-	 * Adds a draw to hexagon 'hexagon's 'space'.
+	 * Increases the draw amount for the settlement at 'hexagon's 'space' if there
+	 * is a city there and it is owned by Player 'player'; otherwise, adds a settlement
+	 * to onSpot 'space' if there is no settlement there.
 	 */
 	public void addDrawToHexagon(int hexagon, int space, Player player) {
 		allSpaces[hexagon].addDraw(space, player);
 	}
 	
-	public Hexagon[] getAllSpaces() {
-		return allSpaces;
+	/**
+	 * @param hexagon
+	 * @param settlement
+	 * @param player
+	 * Removes the settlement on hexagon 'hexagon' and the onSpot 'settlement'
+	 * if Player 'player' owns it.
+	 */
+	public void removeSettlement(int hexagon, int settlement, Player player) {
+		allSpaces[hexagon].removeSettlement(settlement, player);
+	}
+	
+	/**
+	 * @param hexagon
+	 * @param road
+	 * @param player
+	 * Removes the road on hexagon 'hexagon' and the road 'road' if Player
+	 * 'player' owns it.
+	 */
+	public void removeRoad(int hexagon, int road, Player player) {
+		allSpaces[hexagon].removeRoad(road, player);
 	}
 	
 	/**
@@ -89,6 +98,26 @@ public class Map {
 			toReturn[i] = allSpaces[i].getType();
 		}
 		return toReturn;
+	}
+	
+	/**
+	 * @param hexagon
+	 * @return Name of settlements for settlements on hexagon 'hexagon'
+	 */
+	public String[] getSettlementNames(int hexagon) {
+		return allSpaces[hexagon].getSettlementNames();
+	}
+	
+	/**
+	 * @param hexagon
+	 * @return Name of roads for roads on hexagon 'hexagon'
+	 */
+	public String[] getRoadNames(int hexagon) {
+		return allSpaces[hexagon].getRoadNames();
+	}
+
+	public Hexagon[] getAllSpaces() {
+		return allSpaces;
 	}
 	
 }

@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.PriorityQueue;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -16,8 +15,8 @@ public class ClientSide {
 	public ClientSideGUIFinal theGUI;
 	
 	public static void main(String[] args) throws IOException {
-//		InputStreamReader istream = new InputStreamReader(System.in);
-//		BufferedReader reader = new BufferedReader(istream);
+		InputStreamReader istream = new InputStreamReader(System.in);
+		BufferedReader reader = new BufferedReader(istream);
 //		
 //		String ipAddress;
 //		System.out.println("Input the IP Address you want to connect to:");
@@ -41,17 +40,25 @@ public class ClientSide {
 //		
 //		new ClientSide(ipAddress, portIn, portOut, name);
 		
-		new ClientSide("127.0.0.1", 53777, 54777, "Rebant");
+		System.out.println("IP Address:");
+		String ipAddress = reader.readLine();
+		System.out.println("Name:");
+		String name = reader.readLine();
+		new ClientSide(ipAddress, 53777, 54777, name);
+
+//		new ClientSide("127.0.0.1", 53777, 54777, "Rebant");
 	}
 	
 	
 	public ClientSide(String ipAddress, int portIn, int portOut, String name) {
+		System.out.println("Testing.");
 		client = new Client();
 		
 				
 		Kryo kryo = client.getKryo();
 		kryo.register(Request.class);
 		kryo.register(int[].class);
+		kryo.register(String[].class);
 		
 		client.start();
 		
@@ -93,10 +100,14 @@ public class ClientSide {
 		int request = toHandle.getRequest();
 		System.out.println("Handling request: " + request);
 		switch (request) {
+			case 69: theGUI.setTurnCheckBox(true); break;
+			case 98: PopUpStats a = new PopUpStats(toHandle.getHexagonSelected(), toHandle.getRoadNames(), toHandle.getSettlementNames(), this);
+						a.setVisible(true); break;
 			case 99: nameHash = toHandle.getReturnName(); System.out.println("Our hash is " + nameHash); break;
 			case 999: System.out.println("Error: " + toHandle.getMessage()); break;
 			case 1001: System.out.println("Woot."); theGUI = new ClientSideGUIFinal(this, nameHash, toHandle.getMapTypes()); break;
-			case 1002: System.out.println("Updating stats..."); theGUI.updateResourceNumber(toHandle.getResourceStats()); break;
+			case 1002: System.out.println("Updating stats..."); theGUI.updateResourceNumber(toHandle.getResourceStats());
+						theGUI.setTurnCheckBox(false); theGUI.updateDieRolled(toHandle.getDieRolled()); break;
 			default: System.out.println("Something bad happened."); System.exit(-100); break;
 		}
 		

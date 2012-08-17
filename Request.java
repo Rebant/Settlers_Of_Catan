@@ -3,7 +3,7 @@
  * @author supervisor
  * Requests are passed to a server for handling game requests.
  */
-public class Request implements Comparable<Request> {
+public class Request {
 	
 	/*
 	 * Things to request
@@ -15,15 +15,18 @@ public class Request implements Comparable<Request> {
 	 * 4. Put back resource card
 	 * 5. Next turn
 	 * 6. Remove a Dev card
-	 * 7. Add settlement
-	 * 8. Add city
-	 * 9. Add road
+	 * 7. Add city
+	 * 8. Add road
+	 * 9. Remove city
+	 * 10. Remove road
+	 * 11. Get hexagon information - 98. Receive hexagon information
+	 * 68. It is client's turn
+	 * 998. Get information about hexagon
 	 * 999. Error - print the message
 	 * 1001. Start the game
 	 * 1002. Update stats for clients
 	 */
 	
-	private boolean goodRequest = false;
 	private int request;
 	private String requestString;
 	private int whichPlayer;
@@ -36,7 +39,10 @@ public class Request implements Comparable<Request> {
 	private String chatText;
 	private int[] mapTypes;
 	private int[] resourceStats;
-
+	private int[] dieRolled;
+	private String[] settlementNames;
+	private String[] roadNames;
+	
 	public void setRequest(int request) {
 		this.request = request;
 	}
@@ -134,11 +140,28 @@ public class Request implements Comparable<Request> {
 		this.resourceStats = resourceStats;
 	}
 
-	// TODO Do I need this?
-	@Override
-	public int compareTo(Request o) {
-		// TODO Auto-generated method stub
-		return 1;
+	public int[] getDieRolled() {
+		return dieRolled;
+	}
+
+	public void setDieRolled(int[] dieRolled) {
+		this.dieRolled = dieRolled;
+	}
+
+	public String[] getSettlementNames() {
+		return settlementNames;
+	}
+
+	public void setSettlementNames(String[] settlementNames) {
+		this.settlementNames = settlementNames;
+	}
+
+	public String[] getRoadNames() {
+		return roadNames;
+	}
+
+	public void setRoadNames(String[] roadNames) {
+		this.roadNames = roadNames;
 	}
 
 }

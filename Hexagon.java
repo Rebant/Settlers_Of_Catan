@@ -71,6 +71,7 @@ public class Hexagon {
 	 */
 	public void setSpace(int space, Player player) {
 		if (onSpot[space] != null) { return; }
+		System.out.println("Someone just bought a settlement.");
 		onSpot[space] = new Settlement(1, type, player);
 	}
 	
@@ -82,23 +83,65 @@ public class Hexagon {
 	 */
 	public void setRoad(int road, Player player) {
 		if (roads[road] != null) { return; }
+		System.out.println("Someone just bought a road.");
 		roads[road] = new Road(player);
 	}
 	
 	/**
 	 * @param space
 	 * @param player
-	 * Increments the amount drawn on the settlement on space 'space' if the
-	 * player owns the spot.
+	 * Increases the draw amount for the settlement at 'hexagon's 'space' if there
+	 * is a city there and it is owned by Player 'player'; otherwise, adds a settlement
+	 * to onSpot 'space' if there is no settlement there.
 	 */
 	public void addDraw(int space, Player player) {
-		if (onSpot[space] == null || !player.equals(onSpot[space].getOwner())) { return; }
-		onSpot[space].incrementAmountToDraw();
+		if (onSpot[space] != null) {
+			if (player.equals(onSpot[space].getOwner())) {
+				System.out.println("Someone just bought a city.");
+				onSpot[space].incrementAmountToDraw();
+			}
+			else { return; }
+		}
+		if (onSpot[space] == null) {
+			setSpace(space, player);
+		}
+	}
+	
+	
+	/**
+	 * @return The names of all the Players that each of the onSpot's are owned by.
+	 */
+	public String[] getSettlementNames() {
+		String[] toReturn = new String[6];
+		for (int i = 0; i < 6; i++) {
+			toReturn[i] = onSpot[i] == null || onSpot[i].getOwner().getName() == null ? "Not bought" : onSpot[i].getOwner().getName();
+			toReturn[i] = i + ": " + toReturn[i];
+		}
+		return toReturn;
+	}
+	
+	/**
+	 * @return The names of all the Players that each of the roads' are owned by
+	 */
+	public String[] getRoadNames() {
+		String[] toReturn = new String[6];
+		for (int i = 0; i < 6; i++) {
+			toReturn[i] = roads[i] == null || roads[i].getOwner().getName() == null ? "Not bought" : roads[i].getOwner().getName();
+			toReturn[i] = i + ": " + toReturn[i];
+		}
+		return toReturn;
 	}
 
+	public void removeSettlement(int onSpot, Player player) {
+		if (this.onSpot[onSpot] == null || !this.onSpot[onSpot].getOwner().equals(player)) { return; }
+		this.onSpot[onSpot] = null;
+	}
 	
+	public void removeRoad(int road, Player player) {
+		if (this.roads[road] == null || !this.roads[road].getOwner().equals(player)) { return; }
+		roads[road] = null;
+	}
 	
-
 	public Settlement[] getOnSpot() {
 		return onSpot;
 	}

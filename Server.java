@@ -1,6 +1,6 @@
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
@@ -17,7 +17,7 @@ public class Server {
 	com.esotericsoftware.kryonet.Server server;
 	Game game; //Game for this Server
 	int whoseTurn;
-	PriorityQueue<RequestConnection> allRequests = new PriorityQueue<RequestConnection>();
+	LinkedBlockingQueue<RequestConnection> allRequests = new LinkedBlockingQueue<RequestConnection>();
 	ArrayList<Connection> allConnections = new ArrayList<Connection>();
 	ArrayList<Integer> allHashes = new ArrayList<Integer>();
 	public int numOfPlayers = 0;
@@ -55,7 +55,7 @@ public class Server {
 //		}
 //		
 //		new Server(numOfPlayers, filename, portIn, portOut);
-		new Server(1, "OriginalGame.txt", 53777, 54777);
+		new Server(2, "OriginalGame.txt", 53777, 54777);
 	}
 	
 	/**
@@ -79,6 +79,7 @@ public class Server {
 		Kryo kryo = server.getKryo();
 		kryo.register(Request.class); //Unsupported by 1.6 Java - need 1.7
 		kryo.register(int[].class);
+		kryo.register(String[].class);
 		System.out.println("Registered all pertinent classes...");
 		
 		server.start();
@@ -111,6 +112,7 @@ public class Server {
 		});
 		
 		System.out.println("Server has been started!");
+		System.out.println("Your IP Address is " + server.getKryo().toString());
 		
 		System.out.println("The number of players is " + game.allPlayers.length);
 		System.out.println("We have so far " + this.numOfPlayers);
@@ -157,9 +159,12 @@ public class Server {
 	 * 4. Put back resource card
 	 * 5. Next turn
 	 * 6. Remove a Dev card
-	 * 7. Add settlement
-	 * 8. Add city
-	 * 9. Add road
+	 * 7. Add city
+	 * 8. Add road
+	 * 9. Remove city
+	 * 10. Remove road
+	 * 11. Get hexagon information - 98. Receive hexagon information
+	 * 998. Get information about hexagon
 	 * 999. Error - print the message
 	 * 1001. Start the game
 	 * 1002. Update stats for clients
@@ -179,43 +184,60 @@ public class Server {
 			case 4: gamePutBackResource(theRequest.getType(), theRequest.getWhichPlayer()); break;
 			case 5: gameNextTurn(theRequest, connection); break;
 			case 6: gameRemoveDev(theRequest); break;
-			case 7: gameAddSettlement(theRequest, connection); break;
-			case 8: gameAddCity(theRequest, connection); break;
-			case 9: gameAddRoad(theRequest, connection); break;
+			case 7: gameAddCity(theRequest, connection); break;
+			case 8: gameAddRoad(theRequest, connection); break;
+			case 9: gameRemoveCity(theRequest, connection); break;
+			case 10: gameRemoveRoad(theRequest, connection); break;
+			case 11: gameGetHexInformation(theRequest, connection); break;
 			default: System.out.println("Someone is trying to hack this game!"); System.exit(-100); break;
 		}
 		
 		if (initialized) { updateStats(); }
 		
-		//TODO: Update every person's screen!!!
-		
+	}
+
+	private void gameGetHexInformation(Request theRequest, Connection connection) {
+		int hexagon = theRequest.getHexagonSelected();
+		String[] settlementNames = game.getSettlementName(hexagon);
+		String[] roadNames = game.getRoadName(hexagon);
+		Request toSend = new Request();
+		toSend.setSettlementNames(settlementNames);
+		toSend.setRoadNames(roadNames);
+		toSend.setHexagonSelected(hexagon);
+		toSend.setRequest(98);
+		connection.sendTCP(toSend);
+	}
+
+	private void gameRemoveRoad(Request theRequest, Connection connection) {
+		System.out.println("You just removed something.");
+		if (!isTurn(theRequest.getWhichPlayer())) { sendError("It is not your turn.", connection); return; }
+		int whichPlayer = theRequest.getWhichPlayer();
+		Player thePlayer = game.getPlayerFromHash(whichPlayer);
+		game.removeRoad(theRequest.getHexagonSelected(), theRequest.getRoadsSpotSelected(), thePlayer);
+	}
+
+	private void gameRemoveCity(Request theRequest, Connection connection) {
+		System.out.println("You just removed something.");
+		if (!isTurn(theRequest.getWhichPlayer())) { sendError("It is not your turn.", connection); return; }
+		int whichPlayer = theRequest.getWhichPlayer();
+		Player thePlayer = game.getPlayerFromHash(whichPlayer);
+		game.removeCity(theRequest.getHexagonSelected(), theRequest.getOnSpotSelected(), thePlayer);
 	}
 
 	private void gameAddRoad(Request theRequest, Connection connection) {
+		System.out.println("Someone is trying to buy a road.");
 		if (!isTurn(theRequest.getWhichPlayer())) { sendError("It is not your turn.", connection); return; }
 		int whichPlayer = theRequest.getWhichPlayer();
 		Player thePlayer = game.getPlayerFromHash(whichPlayer);
 		game.addRoad(theRequest.getHexagonSelected(), theRequest.getRoadsSpotSelected(), thePlayer);
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void gameAddCity(Request theRequest, Connection connection) {
+		System.out.println("Someone is trying to buy a city.");
 		if (!isTurn(theRequest.getWhichPlayer())) { sendError("It is not your turn.", connection); return; }
 		int whichPlayer = theRequest.getWhichPlayer();
 		Player thePlayer = game.getPlayerFromHash(whichPlayer);
 		game.addCity(theRequest.getHexagonSelected(), theRequest.getOnSpotSelected(), thePlayer);
-		// TODO Auto-generated method stub
-		
-	}
-
-	private void gameAddSettlement(Request theRequest, Connection connection) {
-		if (!isTurn(theRequest.getWhichPlayer())) { sendError("It is not your turn.", connection); return; }
-		int whichPlayer = theRequest.getWhichPlayer();
-		Player thePlayer = game.getPlayerFromHash(whichPlayer);
-		game.addCity(theRequest.getHexagonSelected(), theRequest.getOnSpotSelected(), thePlayer);
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void gameRemoveDev(Request theRequest) {
@@ -232,8 +254,6 @@ public class Server {
 		if (!isTurn(theRequest.getWhichPlayer())) { sendError("Not your turn to end the turn.", connection); return; }
 		game.nextTurn();
 		whoseTurn = (whoseTurn + 1) % game.allPlayers.length;
-		// TODO Auto-generated method stub
-		
 	}
 
 
@@ -243,8 +263,6 @@ public class Server {
 	private void gamePutBackResource(int type, int hash) {
 		Player player = game.getPlayerFromHash(hash);
 		game.putResourceBack(type, player);
-		// TODO Auto-generated method stub
-		
 	}
 
 
@@ -254,9 +272,7 @@ public class Server {
 	private void gameDrawResource(Request theRequest) {
 		int whichPlayer = theRequest.getWhichPlayer();
 		Player thePlayer = game.getPlayerFromHash(whichPlayer);
-		game.drawResourceCard(theRequest.getType(), thePlayer);
-		// TODO Auto-generated method stub
-		
+		game.drawResourceCard(theRequest.getType(), thePlayer);		
 	}
 
 
@@ -265,6 +281,7 @@ public class Server {
 
 	private void gameRollDie(Request theRequest, Connection connection) {
 		if (!isTurn(theRequest.getWhichPlayer())) { sendError("Not your turn to roll the dice.", connection); return; }
+		if (game.rolledDie) { sendError("You already rolled!", connection); return; }
 		game.rollDie();
 		// TODO Auto-generated method stub
 		
@@ -289,13 +306,10 @@ public class Server {
 		Request toSendBack = new Request();
 		int hashCode = created.hashCode();
 		allHashes.add(hashCode); //TODO Should do this someplace else in case get more than the amount of hashcodes
-		System.out.println("There are now " + allHashes.size() + " hash codes.");
 		toSendBack.setReturnName(hashCode);
 		toSendBack.setRequest(99);
 		connection.sendTCP(toSendBack);
 		numOfPlayers++;
-		System.out.println("numOfPlayers is " + numOfPlayers);
-		//TODO: Start the game for ALL players?
 	}
 	
 
@@ -332,6 +346,7 @@ public class Server {
 	public void updateStats() {
 		Player player;
 		int[] stats;
+		int[] dieRolled = (game.rolledDice == null ? new int[] {0, 0} : game.rolledDice);
 		Request toSend;
 		for (int i = 0; i < allConnections.size(); i++) {
 			player = game.getPlayerFromHash(allHashes.get(i));
@@ -339,7 +354,11 @@ public class Server {
 			toSend = new Request();
 			toSend.setRequest(1002);
 			toSend.setResourceStats(stats);
+			toSend.setDieRolled(dieRolled);
 			allConnections.get(i).sendTCP(toSend);
+			if (player.hashCode() == game.onPlayer) {
+				toSend = new Request(); toSend.setRequest(69); allConnections.get(i).sendTCP(toSend);
+			}
 		}
 		//TODO Update dev cards
 		//TODO Update map

@@ -14,6 +14,7 @@ public class Game {
 	Player currentPlayer; //Current player's turn
 	int onPlayer;
 	int[] rolledDice;
+	boolean rolledDie;
 	
 	/**
 	 * Creates an instance of Game with 30 starting resource cards for each type
@@ -77,6 +78,7 @@ public class Game {
 	public void rollDie() {
 		Random generator = new Random();
 		rolledDice = new int[] {generator.nextInt(6) + 1, generator.nextInt(6) + 1};
+		rolledDie = true;
 	}
 	
 	/**
@@ -174,18 +176,27 @@ public class Game {
 	
 	/**
 	 * @param hexagon
-	 * @param space
-	 * Sets the appropriate hexagon's 'space' as a new settlement for 'player'.
+	 * @return Name of settlements for settlements on hexagon 'hexagon'
 	 */
-	public void addSettlement(int hexagon, int space, Player player) {
-		map.setNewSettlement(hexagon, space, player);
+	public String[] getSettlementName(int hexagon) {
+		return map.getSettlementNames(hexagon);
+	}
+	
+	/**
+	 * @param hexagon
+	 * @return Name of roads for roads on hexagon 'hexagon'
+	 */
+	public String[] getRoadName(int hexagon) {
+		return map.getRoadNames(hexagon);
 	}
 	
 	/**
 	 * @param hexagon
 	 * @param space
 	 * @param player
-	 * Increases the draw amount for the settlement at 'hexagon's 'space'.
+	 * Increases the draw amount for the settlement at 'hexagon's 'space' if there
+	 * is a city there and it is owned by Player 'player'; otherwise, adds a settlement
+	 * to onSpot 'space' if there is no settlement there.
 	 */
 	public void addCity(int hexagon, int space, Player player) {
 		map.addDrawToHexagon(hexagon, space, player);
@@ -203,12 +214,36 @@ public class Game {
 	}
 	
 	/**
+	 * @param hexagon
+	 * @param settlement
+	 * @param player
+	 * Removes the settlement on hexagon 'hexagon' and the onSpot 'settlement'
+	 * if Player 'player' owns it.
+	 */
+	public void removeCity(int hexagon, int settlement, Player player) {
+		map.removeSettlement(hexagon, settlement, player);
+	}
+	
+	/**
+	 * @param hexagon
+	 * @param road
+	 * @param player
+	 * Removes the road on hexagon 'hexagon' and the road 'road' if Player
+	 * 'player' owns it.
+	 */
+	public void removeRoad(int hexagon, int road, Player player) {
+		map.removeRoad(hexagon, road, player);
+	}
+	
+	/**
 	 * Advances the turn to the next player.
 	 */
 	public void nextTurn() {
 		currentPlayerInt = (currentPlayerInt + 1) % allPlayers.length;
 		currentPlayer = allPlayers[currentPlayerInt];
 		onPlayer = currentPlayer.hashCode();
+		rolledDie = false;
+		rolledDice = null;
 	}
 	
 	/**
